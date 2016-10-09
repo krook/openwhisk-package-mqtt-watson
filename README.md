@@ -1,7 +1,7 @@
 # OpenWhisk MQTT Package for Watson IoT
 ==========================
 
-This package provides a mechanism to trigger OpenWhisk actions when messages are received on an MQTT topic in the Watson IoT Platform. It sets up a Cloud Foundry application that can be configured to listen to one or more topics on a persistent connection, then invokes the registered actions.
+This package provides a mechanism to trigger OpenWhisk actions when messages are received on an MQTT topic in the Watson IoT Platform. It sets up a Cloud Foundry application that can be configured to listen to one or more topics on a persistent connection, then invokes the registered actions as a feed action.
 
 ```
 openwhisk-package-mqtt-watson/
@@ -45,11 +45,20 @@ TODO: Diagram here.
 The main action in this package is `feed-action.js`. When a trigger is associated to this action, it causes the action to subscribe to an MQTT topic as an application (not a device) so that it can receive messages that will in turn trigger your custom actions.
 
 ###### Parameters
+$WSK trigger create openfridge-feed-trigger \
+  -f mqtt/mqtt-feed-action \
+  -p url "ssl://$WATSON_TEAM_ID.messaging.internetofthings.ibmcloud.com:8883" \
+  -p topic "$WATSON_TOPIC" \
+  -p username "$WATSON_USERNAME" \
+  -p password "$WATSON_PASSWORD" \
+  -p client "$WATSON_CLIENT"
 | **Parameter** | **Type** | **Required** | **Description**| **Options** | **Default** | **Example** |
 | ------------- | ---- | -------- | ------------ | ------- | ------- |------- |
 | url | *string* | yes |  Url to RSS feed | - | - | "http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml" |
-| pollingInterval | *string* | yes |  Interval at which polling is performed | - | - | "2h" |
-| filter | *string* | no |  Comma separted list of keywords to filter on| - | - | "Washington D.C.,capital" |
+| topic | *string* | yes |  Topic to subscribe to | - | - | "iot-2/type/+/id/+/evt/+/fmt/json" |
+| username | *string* | yes |  App user name| - | - | "a-123xyz" |
+| password | *string* | yes |  App password| - | - | "+-derpbog" |
+| client | *string* | yes |  App client id| - | - | "a:12e45g:mqttapp" |
 
 ## Watson MQTT Package Installation
 

@@ -49,5 +49,5 @@ $WSK_CLI --apihost $APIHOST package update --auth $AUTH --shared yes -p apiHost 
 $WSK_CLI --apihost $APIHOST action update --auth $AUTH --shared yes mqtt-watson/feed-action $PACKAGE_HOME/feeds/feed.js \
     -a feed true \
     -a description "A feed action to register to Watson IoT MQTT events meeting user specified criteria" \
-    -a parameters '[{"name": "url", "required": true, "bindTime": true, "description": "Source URL"}, {"name": "pollingInterval", "required": true, "bindTime": true, "description": "RSS polling interval"},{"name": "filter", "required": false, "bindTime": true, "description": "Comma separated list of keywords to watch for"}]' \
+    -a parameters '[{"name": "url", "required": true, "bindTime": true, "description": "Source URL"}, {"name": "topic", "required": true, "bindTime": true, "description": "Topic to subscribe to"}, {"name": "username", "required": true, "bindTime": true, "": "App user name"}, {"name": "password", "required": true, "bindTime": true, "": "App password"}, {"name": "client", "required": true, "bindTime": true, "": "App client id"}]' \
     -a sampleInput '{"url": "ssl://a-123xyz.messaging.internetofthings.ibmcloud.com:8883", "topic": "iot-2/type/+/id/+/evt/+/fmt/json", "username": "a-123xyz", "password": "+-derpbog", "client": "a:12e45g:mqttapp"}' \
