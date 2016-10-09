@@ -133,7 +133,7 @@ This service can also run as a Node.js app on your local machine.
 Note: Local deployment of this service requires extra configuration if it's to be run with the Bluemix OpenWhisk.
 
 ## Usage of Watson MQTT package
-To use this trigger feed, you need to pass the required parameters (refer to the table below)
+To use this trigger feed, you need to pass all of the required parameters (refer to the table above)
 
 ```
 $WSK_CLI trigger create subscription-event-trigger \
@@ -145,7 +145,7 @@ $WSK_CLI trigger create subscription-event-trigger \
     -p client "$WATSON_CLIENT"
 ```
 
-For example
+For example:
 ```
 $WSK_CLI trigger create subscription-event-trigger \
     -f mqtt-watson/feed-action \
@@ -156,7 +156,7 @@ $WSK_CLI trigger create subscription-event-trigger \
     -p client "a:12e45g:mqttapp"
 ```
 
-To use trigger feed to delete created trigger.
+To use trigger feed to delete the trigger.
 
 `$WSK_CLI trigger delete subscription-event-trigger`
 
@@ -192,7 +192,7 @@ To use trigger feed to delete created trigger.
 
  ```
  {
-     "payload": "Device with serial: 123456 emitted a reading: 15."
+     "payload": "Device with serial: 123456 emitted a reading: 15"
  }
  ```
 ## How to do tests
@@ -211,6 +211,6 @@ Please refer to [CONTRIBUTING.md](CONTRIBUTING.md)
 ## License
 Copyright 2016 IBM Corporation
 
-Licensed under the [Apache License, Version 2.0 (the "License")](http://www.apache.org/licenses/LICENSE-2.0.html).
+Licensed under the [MIT license](LICENSE.txt).
 
 Unless required by applicable law or agreed to in writing, software distributed under the license is distributed on an "as is" basis, without warranties or conditions of any kind, either express or implied. See the license for the specific language governing permissions and limitations under the license.

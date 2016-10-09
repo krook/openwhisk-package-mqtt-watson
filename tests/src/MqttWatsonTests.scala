@@ -31,17 +31,25 @@ class TemplateTests extends TestHelpers with WskTestHelpers with Matchers {
   implicit val wskprops = WskProps()
   val wsk = new Wsk()
 
-  val credentials = TestUtils.getVCAPcredentials("template_service")
-  val apiKey = credentials.get("apiKey");
+  //val credentials = TestUtils.getVCAPcredentials("openwhisk-local")
+  //val apiKey = credentials.get("apiKey");
 
-  behavior of "Template Package"
+  behavior of "Watson MQTT Package"
 
-  "helloworld action" should "return Hello, World!" in {
-    val actionName = "/whisk.system/packageTemplate/helloWorld"
-    val params = HashMap("name" -> "Openwhisk".toJson);
+    "trigger creation" should "return ok: created trigger feed" in {
+    val triggerName = "trigger_rss_update"
+    val feed = Some("/guest/rss/rss_feed")
+    val annotation = Map("dummy"->"dummy".toJson)
+    val params = Map("url" -> "http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml".toJson, "pollingInterval" -> "2h".toJson);
 
-    withActivation(wsk.activation, wsk.action.invoke(actionName, params)) {
-      _.fields("response").toString should include(s""""message":"Hello, Openwhisk!"""")
+    var res = wsk.trigger.create(triggerName,params,annotation,feed)
+    res.toString should include("ok: created trigger feed")
     }
-  }
+
+    "trigger deletion" should "return ok: deleted" in {
+    val triggerName = "trigger_rss_update"
+
+    var res = wsk.trigger.delete(triggerName);
+    res.toString should include("ok: deleted ")
+    }
 }
