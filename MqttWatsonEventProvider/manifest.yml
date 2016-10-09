@@ -1,0 +1,10 @@
+applications:
+- name: mqtt-watson-${random-word}
+  host: mqtt-watson-${random-word}
+  path: .
+  domain: mybluemix.net
+  instances: 1
+  memory: 512M
+  buildpack: nodejs_buildpack
+  services:
+  - cloudant-mqtt-watson

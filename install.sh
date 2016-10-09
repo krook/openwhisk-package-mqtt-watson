@@ -21,11 +21,11 @@ set -x
 
 if [ $# -eq 0 ]
 then
-    echo "Usage: ./install.sh $APIHOST $AUTH $WSK_CLI $PROVIDER_ENDPOINT"
+    echo "Usage: ./install.sh $API_HOST $AUTH_KEY $WSK_CLI $PROVIDER_ENDPOINT"
 fi
 
-APIHOST="$1"
-AUTH="$2"
+API_HOST="$1"
+AUTH_KEY="$2"
 WSK_CLI="$3"
 PROVIDER_ENDPOINT="$4"
 
@@ -42,11 +42,11 @@ echo Installing Watson MQTT Package \
 #     -p password "$WATSON_PASSWORD" \
 #     -p client "$WATSON_CLIENT"
 
-$WSK_CLI --apihost $APIHOST package update --auth $AUTH --shared yes -p apiHost $APIHOST -p provider_endpoint $PROVIDER_ENDPOINT mqtt-watson \
+$WSK_CLI --apihost $API_HOST package update --auth $AUTH_KEY --shared yes -p apiHost $API_HOST -p provider_endpoint $PROVIDER_ENDPOINT mqtt-watson \
     -a description "Watson MQTT Package" \
     -a parameters '[{"name":"provider_endpoint", "required":true, "bindTime":true, "description":"Watson IoT MQTT provider host"}]'
 
-$WSK_CLI --apihost $APIHOST action update --auth $AUTH --shared yes mqtt-watson/feed-action $PACKAGE_HOME/feeds/feed.js \
+$WSK_CLI --apihost $API_HOST action update --auth $AUTH_KEY --shared yes mqtt-watson/feed-action $PACKAGE_HOME/feeds/feed.js \
     -a feed true \
     -a description "A feed action to register to Watson IoT MQTT events meeting user specified criteria" \
     -a parameters '[{"name": "url", "required": true, "bindTime": true, "description": "Source URL"}, {"name": "topic", "required": true, "bindTime": true, "description": "Topic to subscribe to"}, {"name": "username", "required": true, "bindTime": true, "": "App user name"}, {"name": "password", "required": true, "bindTime": true, "": "App password"}, {"name": "client", "required": true, "bindTime": true, "": "App client id"}]' \
