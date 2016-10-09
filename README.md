@@ -52,9 +52,10 @@ $WSK trigger create openfridge-feed-trigger \
   -p username "$WATSON_USERNAME" \
   -p password "$WATSON_PASSWORD" \
   -p client "$WATSON_CLIENT"
+
 | **Parameter** | **Type** | **Required** | **Description**| **Options** | **Default** | **Example** |
 | ------------- | ---- | -------- | ------------ | ------- | ------- |------- |
-| url | *string* | yes |  Url to RSS feed | - | - | "http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml" |
+| url | *string* | yes |  URL to Watson MQTT feed | - | - | "ssl://a-123xyz.messaging.internetofthings.ibmcloud.com:8883" |
 | topic | *string* | yes |  Topic to subscribe to | - | - | "iot-2/type/+/id/+/evt/+/fmt/json" |
 | username | *string* | yes |  App user name| - | - | "a-123xyz" |
 | password | *string* | yes |  App password| - | - | "+-derpbog" |
