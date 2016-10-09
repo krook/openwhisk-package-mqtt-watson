@@ -1,7 +1,7 @@
 # OpenWhisk MQTT Package for Watson IoT
 ==========================
 
-This package provides a way to trigger OpenWhisk actions when messages are received on an MQTT topic in the Watson IoT Platform.
+This package provides a mechanism to trigger OpenWhisk actions when messages are received on an MQTT topic in the Watson IoT Platform. It sets up a Cloud Foundry application that can be configured to listen to one or more topics on a persistent connection, then invokes the registered actions.
 
 ```
 openwhisk-package-mqtt-watson/
@@ -108,9 +108,9 @@ Note: Local deployment of this service requires extra configuration if it's to b
 To use this trigger feed, you need to pass the required parameters (refer to the table below)
 
 ```
-wsk trigger create rss_trigger --feed /namespace/mqtt-watson/feed-action -p url 'url_to_rss' -p pollingInterval 'timePeriod'
+$WSK_CLI trigger create rss_trigger --feed /namespace/mqtt-watson/feed-action -p url 'url_to_rss' -p pollingInterval 'timePeriod'
 
-$WSK trigger create openfridge-feed-trigger \
+$WSK_CLI trigger create message-to-hello-trigger \
     -f mqtt/mqtt-feed-action \
     -p topic "$WATSON_TOPIC" \
     -p url "ssl://$WATSON_TEAM_ID.messaging.internetofthings.ibmcloud.com:8883" \
@@ -121,7 +121,7 @@ $WSK trigger create openfridge-feed-trigger \
 
 For example
 ```
-$WSK trigger create openfridge-feed-trigger \
+$WSK_CLI trigger create message-to-hello-trigger \
     -f mqtt/mqtt-feed-action \
     -p topic "iot-2/type/+/id/+/evt/+/fmt/json" \
     -p url "ssl://12e45g.messaging.internetofthings.ibmcloud.com:8883" \
@@ -132,14 +132,11 @@ $WSK trigger create openfridge-feed-trigger \
 
 To use trigger feed to delete created trigger.
 
-`wsk trigger delete openfridge-feed-trigger`
+`$WSK_CLI trigger delete message-to-hello-trigger`
 
 ## Associate Watson MQTT trigger and action by using rule
- 1. Create a new trigger, for example:
- `wsk trigger create rss_trigger --feed /guest/rss/rss_feed -p url 'http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml'  -p pollingInterval  '2h'   -p whiskHost  whiskhostip`
-
- ```
- $WSK trigger create openfridge-feed-trigger \
+ 1. Create a new trigger, for example: ```
+ $WSK_CLI trigger create message-to-hello-trigger \
      -f mqtt/mqtt-feed-action \
      -p topic "iot-2/type/+/id/+/evt/+/fmt/json" \
      -p url "ssl://12e45g.messaging.internetofthings.ibmcloud.com:8883" \
@@ -148,30 +145,32 @@ To use trigger feed to delete created trigger.
      -p client "a:12e45g:mqttapp"
  ```
 
- 2. Write a 'hello.js' file that reacts to the trigger events with action code below:
+ 2. Write a 'hello-action.js' file that reacts to the trigger events with action code below:
  ```
  function main(params) {
-   var title = params.title || 'world';
-   var des = params.description || 'default_description';
-   return {payload: 'hello,' + title + '!'+ 'description' + des};
+   // Read the MQTT inbound message JSON, removing newlines.
+   var service = JSON.parse(params.body.replace(/\r?\n|\r/g, ''));
+   var serial = service.serial || "xxxxxx";
+   var reading = service.reading || 100;
+   return {payload: 'Hello,' + serial + '!'+ ' reading: ' + reading};
  }
  ```
  Upload the action exists:
- `wsk action create hello hello.js`
+ `$WSK_CLI action create hello-action hello-action.js`
 
  3. Create the rule that associate the trigger and the action:
- `$WSK rule create --enable openfridge-feed-rule openfridge-feed-trigger analyze-service-event`
+ `$WSK_CLI rule create --enable watson-mqtt-message-rule message-to-hello-trigger hello-action`
 
  4. So once there are any rss updates that trigger events, you can verify the action was invoked by checking the most recent activations:
 
- `wsk activation list --limit 1  hello`
+ `$WSK_CLI activation list --limit 1  hello`
 
  ```
  activations
  f9d41bd2589943efa4f36c5cf1f55b44             hello
  ```
 
- `wsk activation result f9d41bd2589943efa4f36c5cf1f55b44`
+ `$WSK_CLI activation result f9d41bd2589943efa4f36c5cf1f55b44`
 
  ```
  {

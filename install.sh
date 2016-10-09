@@ -32,14 +32,22 @@ PROVIDER_ENDPOINT="$4"
 PACKAGE_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo Installing Watson MQTT Package \
 
-$WSK_CLI --apihost $APIHOST package update --auth $AUTH --shared yes -p apiHost $APIHOST -p provider_endpoint $PROVIDER_ENDPOINT mqtt-watson \
-    -a description "RSS Package" \
-    -a parameters '[{"name":"provider_endpoint","required":true,"bindTime":true,"description":"Watson IoT MQTT provider host"}]'
+# $WSK package create -p provider_endpoint "http://$CF_PROXY_HOST.mybluemix.net/mqtt" mqtt
+# $WSK action create -a feed true mqtt/mqtt-feed-action actions/mqtt-feed-action.js
+#   $WSK trigger create openfridge-feed-trigger \
+#     -f mqtt/mqtt-feed-action \
+#     -p url "ssl://$WATSON_TEAM_ID.messaging.internetofthings.ibmcloud.com:8883" \
+#     -p topic "$WATSON_TOPIC" \
+#     -p username "$WATSON_USERNAME" \
+#     -p password "$WATSON_PASSWORD" \
+#     -p client "$WATSON_CLIENT"
 
+$WSK_CLI --apihost $APIHOST package update --auth $AUTH --shared yes -p apiHost $APIHOST -p provider_endpoint $PROVIDER_ENDPOINT mqtt-watson \
+    -a description "Watson MQTT Package" \
+    -a parameters '[{"name":"provider_endpoint", "required":true, "bindTime":true, "description":"Watson IoT MQTT provider host"}]'
 
 $WSK_CLI --apihost $APIHOST action update --auth $AUTH --shared yes mqtt-watson/feed-action $PACKAGE_HOME/feeds/feed.js \
     -a feed true \
-    -a description "A feed action to register for Watson IoT MQTT events meeting user specified criteria" \
-    -a parameters '[{"name":"url","required":true,"bindTime":true,"description":"Source URL"},{"name":"pollingInterval","required":true,"bindTime":true,"description":"RSS polling interval"},{"name":"filter","required":false,"bindTime":true,"description":"Comma separated list of keywords to watch for"}]' \
-    -a sampleInput '{"url":"http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml","pollingInterval":"2h", "filter":"Washington, Capitol"}' \
-    
+    -a description "A feed action to register to Watson IoT MQTT events meeting user specified criteria" \
+    -a parameters '[{"name": "url", "required": true, "bindTime": true, "description": "Source URL"}, {"name": "pollingInterval", "required": true, "bindTime": true, "description": "RSS polling interval"},{"name": "filter", "required": false, "bindTime": true, "description": "Comma separated list of keywords to watch for"}]' \
+    -a sampleInput '{"url": "ssl://a-123xyz.messaging.internetofthings.ibmcloud.com:8883", "topic": "iot-2/type/+/id/+/evt/+/fmt/json", "username": "a-123xyz", "password": "+-derpbog", "client": "a:12e45g:mqttapp"}' \
