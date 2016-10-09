@@ -5,7 +5,7 @@ This package provides a mechanism to trigger OpenWhisk actions when messages are
 
 You can consume it as a shared service for testing by using `/krook@us.ibm.com_dev/mqtt-watson/feed-action`.
 
-This code is based on the MQTT package originally created by James Thomas.
+This code is based on the MQTT package originally created by [James Thomas](http://jamesthom.as/blog/2016/06/15/openwhisk-and-mqtt/).
 
 ```
 openwhisk-package-mqtt-watson/
@@ -166,11 +166,11 @@ To use trigger feed to delete created trigger.
  2. Write a 'hello-action.js' file that reacts to the trigger events with action code below:
  ```
  function main(params) {
-   // Read the MQTT inbound message JSON, removing newlines.
-   var service = JSON.parse(params.body.replace(/\r?\n|\r/g, ''));
-   var serial = service.serial || "xxxxxx";
-   var reading = service.reading || 100;
-   return { payload: 'Device with serial: ' + serial + '!'+ ' emitted a reading: ' + reading };
+    // Read the MQTT inbound message JSON, removing newlines.
+    var service = JSON.parse(params.body.replace(/\r?\n|\r/g, ''));
+    var serial = service.serial || "xxxxxx";
+    var reading = service.reading || 100;
+    return { payload: 'Device with serial: ' + serial + '!'+ ' emitted a reading: ' + reading };
  }
  ```
  Upload the action:
