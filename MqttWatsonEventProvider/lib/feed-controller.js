@@ -7,18 +7,18 @@ const TriggerStore = require('./trigger-store.js');
 
 class FeedController {
     constructor (db, ow_endpoint) {
-        this.mqtt-subscription-manager = new MQTTSubscriptionMgr(mqtt);
-        this.trigger-store = new TriggerStore(db);
+        this.mqtt_subscription_manager = new MQTTSubscriptionMgr(mqtt);
+        this.trigger_store = new TriggerStore(db);
         this.ow_endpoint = ow_endpoint;
     }
 
     initialise () {
-        const mgr = this.mqtt-subscription-manager;
+        const mgr = this.mqtt_subscription_manager;
         mgr.on('message', (url, topic, message) => this.on_message(url, topic, message));
         mgr.on('connected', url => this.on_conn_status('connected', url));
         mgr.on('disconnected', url => this.on_conn_status('disconnected', url));
 
-        return this.trigger-store.subscribers().then(subscribers => {
+        return this.trigger_store.subscribers().then(subscribers => {
             subscribers.forEach(s => mgr.subscribe.apply(mgr, s.topic.split('#')));
         }).catch(err => {
             console.error('Error initialising subscribers from CouchDB store.' , err.reason);
@@ -28,7 +28,7 @@ class FeedController {
     
     on_conn_status (status, url) {
         const params = {type: 'status', body: status};
-        this.trigger-store.triggers(url).then(triggers => {
+        this.trigger_store.triggers(url).then(triggers => {
            triggers.forEach(trigger => this.fire_trigger(trigger, params));
         }).catch(err => console.error('Unable to forward connection status to triggers.', err))
     }
@@ -36,7 +36,7 @@ class FeedController {
     on_message (url, topic, message) {
         console.log(`Message received (${url}) #${topic}: ${message}`);
         const params = {type: 'message', body: message};
-        this.trigger-store.triggers(url, topic).then(triggers => {
+        this.trigger_store.triggers(url, topic).then(triggers => {
             triggers.forEach(trigger => this.fire_trigger(trigger, params));
         }).catch(err => console.error('Unable to forward message to triggers.', err.reason))
     }
@@ -52,8 +52,8 @@ class FeedController {
 
     // trigger: trigger (namespace/name), url, topic, username, password, apiKey, apiToken, clientId
     add_trigger (trigger) {
-        const mgr = this.mqtt-subscription-manager;
-        return this.trigger-store.add(trigger).then(() => { 
+        const mgr = this.mqtt_subscription_manager;
+        return this.trigger_store.add(trigger).then(() => { 
             mgr.subscribe(trigger.url, trigger.topic, trigger.apiKey, trigger.apiToken, trigger.clientId);
             if (mgr.is_connected(trigger.url)) {
                const params = {type: 'status', body: 'connected'};
@@ -63,8 +63,8 @@ class FeedController {
     }
 
     remove_trigger (namespace, trigger) {
-        const mgr = this.mqtt-subscription-manager;
-        return this.trigger-store.remove(`${namespace}/${trigger}`).then(() => mgr.unsubscribe(trigger.url, trigger.topic));
+        const mgr = this.mqtt_subscription_manager;
+        return this.trigger_store.remove(`${namespace}/${trigger}`).then(() => mgr.unsubscribe(trigger.url, trigger.topic));
     }
 }
 

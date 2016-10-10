@@ -12,21 +12,13 @@ The code is based on the generic MQTT package originally created by [James Thoma
 ```
 openwhisk-package-mqtt-watson/
 ├── actions
-│   └── ...
+│      └── handler-action.js
 ├── CONTRIBUTING.md
 ├── feeds
 │      └── feed-action.js
 ├── install.sh
 ├── LICENSE.txt
 ├── README.md
-├── tests
-│   ├── credentials.json
-│   ├── credentials.json.enc
-│   └── src
-│      └── MqttWatsonTests.scala
-├── tools
-│   └── travis
-│       └── build.sh
 ├── MqttWatsonEventProvider
 │      ├── index.js
 │      ├── manifest.yml
@@ -64,31 +56,16 @@ The main feed action in this package is `feed-action.js`. When a trigger is asso
 ### Bluemix Installation
 First you need to install the `wsk` CLI, follow the instructions at https://new-console.ng.bluemix.net/openwhisk/cli
 
-This step assumes you've already deployed the Event Provider application. If not, see the section below.
+This step assumes you've already deployed the Event Provider application (or you are using the test one at `http://openwhisk-package-mqtt-watson.mybluemix.net/mqtt-watson`). If not, see the section below.
 
 `./install.sh openwhisk.ng.bluemix.net $AUTH_KEY $WSK_CLI $PROVIDER_ENDPOINT`
 
-`./uninstall.sh openwhisk.ng.bluemix.net $API_HOST $AUTH_KEY $WSK_CLI`
+`./uninstall.sh openwhisk.ng.bluemix.net $AUTH_KEY $WSK_CLI`
 
 where:
 - **$AUTH_KEY** is the OpenWhisk authentication key (Run `wsk property get` to obtain it)
 - **$WSK_CLI** is the path of OpenWhisk command interface binary
 - **$PROVIDER_ENDPOINT** is the endpoint of the event provider service running as a Cloud Foundry application on Bluemix. It's a fully qualified URL including the path to the resource. i.e. http://mqtt-watson-random-word.mybluemix.net/mqtt-watson
-
-### Local Installation:
-Local installation requires running the OpenWhisk environment locally prior to installing the package. To run OpenWhisk locally follow the instructions at https://github.com/openwhisk/openwhisk/blob/master/tools/vagrant/README.md.    
-
-`./install.sh $API_HOST $AUTH_KEY $WSK_CLI $PROVIDER_ENDPOINT`
-
-`./uninstall.sh $API_HOST $AUTH_KEY $WSK_CLI`
-
-where:
-- **$API_HOST** is where OpenWhisk is deployed
-- **$AUTH_KEY** is the OpenWhisk authentication key (Run `wsk property get` to obtain it)
-- **$WSK_CLI** is the path of OpenWhisk command interface binary
-- **$PROVIDER_ENDPOINT** is the endpoint of the event provider service running as a Node.js application. It's a fully qualified URL including the path to the resource. i.e. http://host:port/mqtt-watson
-
-This will create a new package called **mqtt-watson** as well as feed action within the package.
 
 
 ## Watson IoT MQTT Service (Event Provider) Deployment
@@ -125,17 +102,6 @@ This service can be hosted as a Cloud Foundry application. To deploy on IBM Blue
 3. Change the name and host fields in the manifest.yml to be unique. Bluemix requires routes to be globally unique.
 4. Run `cf push`
 
-### Local Deployment:
-This service can also run as a Node.js app on your local machine.
-
-1. Install a local CouchDB, for how to install a CouchDB locally, please follow instruction at https://developer.ibm.com/open/2016/05/23/setup-openwhisk-use-local-couchdb/
-
-2. Create a database with name `topic_listeners` in the CouchDB. Then create the subscriptions design document as shown above.
-
-3. Run the following command, `node index.js $CLOUDANT_apiKey $CLOUDANT_apiToken $OPENWHISK_AUTH_KEY`
-
-Note: Local deployment of this service requires extra configuration if it's to be run with the Bluemix OpenWhisk.
-
 ## Usage of Watson MQTT package
 To use this trigger feed, you need to pass all of the required parameters (refer to the table above)
 
@@ -146,7 +112,7 @@ $WSK_CLI trigger create subscription-event-trigger \
     -p url "ssl://$WATSON_TEAM_ID.messaging.internetofthings.ibmcloud.com:8883" \
     -p apiKey "$WATSON_apiKey" \
     -p apiToken "$WATSON_apiToken" \
-    -p client "$WATSON_CLIENT"
+    -p clientId "$WATSON_CLIENT"
 ```
 
 For example:
@@ -157,7 +123,7 @@ $WSK_CLI trigger create subscription-event-trigger \
     -p url "ssl://12e45g.messaging.internetofthings.ibmcloud.com:8883" \
     -p apiKey "a-123xyz" \
     -p apiToken "+-derpbog" \
-    -p client "a:12e45g:mqttapp"
+    -p clientId "a:12e45g:mqttapp"
 ```
 
 To use trigger feed to delete the trigger.
@@ -178,7 +144,7 @@ To use trigger feed to delete the trigger.
  }
  ```
  Upload the action:
- `$WSK_CLI action create handler-action handler-action.js`
+ `$WSK_CLI action create handler-action actions/handler-action.js`
 
  3. Create the rule that associate the trigger and the action:
  `$WSK_CLI rule create --enable handle-topic-message-rule subscription-event-trigger handler-action`
@@ -199,16 +165,6 @@ To use trigger feed to delete the trigger.
      "payload": "Device with serial: 123456 emitted a reading: 15"
  }
  ```
-## How to do tests
-The integration test could only be performed with a local OpenWhisk deployment:
-
-   1. Copy your test files into `openwhisk/tests/src/packages`   
-   2. `vagrant ssh` to your local vagrant environment      
-   3. Navigate to the openwhisk directory   
-   3. Update whisk.properties with the path to the credentials.json file
-   4. Run this command - `gradle :tests:test --tests "packages.MqttWatsonTests"`   
-
-To execute all tests, run `gradle :tests:test`
 
 ## Contributing
 Please refer to [CONTRIBUTING.md](CONTRIBUTING.md)
