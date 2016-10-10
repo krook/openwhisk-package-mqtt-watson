@@ -22,8 +22,6 @@ import org.scalatest.Matchers
 import org.scalatest.junit.JUnitRunner
 import spray.json._
 import spray.json.DefaultJsonProtocol.StringJsonFormat
-import scala.collection.immutable.HashMap
-import org.scalatest.FlatSpecLike
 
 @RunWith(classOf[JUnitRunner])
 class MqttWatsonTests extends TestHelpers with WskTestHelpers with Matchers {
@@ -38,10 +36,34 @@ class MqttWatsonTests extends TestHelpers with WskTestHelpers with Matchers {
   val apiToken = credentials.get("apiToken");
   val client = credentials.get("client");
 
+  /*
+  echo "Creating the MQTT package and feed action"
+  $WSK package create -p provider_endpoint "http://$CF_PROXY_HOST.mybluemix.net/mqtt" mqtt
+  $WSK action create -a feed true mqtt/mqtt-feed-action actions/mqtt-feed-action.js
+
+  echo "Creating triggers"
+  $WSK trigger create openfridge-feed-trigger \
+    -f mqtt/mqtt-feed-action \
+    -p topic "$WATSON_TOPIC" \
+    -p url "ssl://$WATSON_TEAM_ID.messaging.internetofthings.ibmcloud.com:8883" \
+    -p username "$WATSON_USERNAME" \
+    -p password "$WATSON_PASSWORD" \
+    -p client "$WATSON_CLIENT"
+  */
+
   behavior of "Watson MQTT Package"
 
+    var res = wsk.package.create("watson-mqtt", params, annotation, feed)
+    res.toString should include("ok: created package")
+    } 
+
+    val actionName = "watson-mqtt/mqtt-feed-action"
+    var res = wsk.action.create(actionName, params, annotation, feed)
+    res.toString should include("ok: created trigger feed")
+    } 
+
     "trigger creation" should "return ok: created trigger feed" in {
-    val triggerName = "trigger_watson_iot_update"
+    val triggerName = "subscription-event-trigger"
     val feed = Some("/guest/watson-mqtt/feed-action")
     val annotation = Map("dummy"->"dummy".toJson)
     val params = Map(
@@ -52,14 +74,21 @@ class MqttWatsonTests extends TestHelpers with WskTestHelpers with Matchers {
       "client" -> client.toJson
     );
 
-    var res = wsk.trigger.create(triggerName,params,annotation,feed)
+    var res = wsk.trigger.create(triggerName, params, annotation, feed)
     res.toString should include("ok: created trigger feed")
     }
 
     "trigger deletion" should "return ok: deleted" in {
-    val triggerName = "trigger_rss_update"
+    val triggerName = "subscription-event-trigger"
 
     var res = wsk.trigger.delete(triggerName);
+    res.toString should include("ok: deleted ")
+    }
+
+    "action deletion" should "return ok: deleted" in {
+    val actionName = "mqtt/mqtt-feed-action"
+
+    var res = wsk.action.delete(actionName);
     res.toString should include("ok: deleted ")
     }
 }

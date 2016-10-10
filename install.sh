@@ -36,7 +36,7 @@ $WSK_CLI --apihost $API_HOST package update --auth $AUTH_KEY --shared yes -p api
     -a description "Watson MQTT Package" \
     -a parameters '[{"name":"provider_endpoint", "required":true, "bindTime":true, "description":"Watson IoT MQTT event provider host"}]'
 
-$WSK_CLI --apihost $API_HOST action update --auth $AUTH_KEY --shared yes mqtt-watson/feed-action $PACKAGE_HOME/feeds/feed.js \
+$WSK_CLI --apihost $API_HOST action update --auth $AUTH_KEY --shared yes mqtt-watson/feed-action $PACKAGE_HOME/mqtt-watson/feed-action.js \
     -a feed true \
     -a description "A feed action to register to Watson IoT MQTT events meeting user specified criteria" \
     -a parameters '[{"name": "url", "required": true, "bindTime": true, "description": "Watson MQTT host URL"}, {"name": "topic", "required": true, "bindTime": true, "description": "MQTT topic to subscribe to"}, {"name": "apiKey", "required": true, "bindTime": true, "": "API key"}, {"name": "apiToken", "required": true, "bindTime": true, "": "API token"}, {"name": "client", "required": true, "bindTime": true, "": "Application client id"}]' \

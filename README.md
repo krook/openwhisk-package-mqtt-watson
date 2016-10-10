@@ -42,10 +42,10 @@ openwhisk-package-mqtt-watson/
 ![Architecture](watson-mqtt-overview.png?raw=true "High Level Architecture")
 
 ## Package contents
-| Entity | Type | Parameters | Description |
-| --- | --- | --- | --- |
-| `/namespace/mqtt-watson` | package | - | OpenWhisk Package for Watson IoT MQTT |
-| `/namespace/mqtt-watson/feed-action.js` | action | [details](#hello-world) | Subscribes to a Watson IoT MQTT topic |
+| Entity | Type | Description |
+| --- | --- | --- |
+| `/namespace/mqtt-watson` | package | OpenWhisk Package for Watson IoT MQTT |
+| `/namespace/mqtt-watson/feed-action.js` | action | Subscribes to a Watson IoT MQTT topic |
 
 ### Feeds
 The main feed action in this package is `feed-action.js`. When a trigger is associated to this action, it causes the action to subscribe to an MQTT topic as an application (not a device) so that it can receive messages that will in turn trigger your custom actions.
@@ -203,7 +203,8 @@ The integration test could only be performed with a local OpenWhisk deployment:
    1. Copy your test files into `openwhisk/tests/src/packages`   
    2. `vagrant ssh` to your local vagrant environment      
    3. Navigate to the openwhisk directory   
-   4. Run this command - `gradle :tests:test --tests "packages.CLASS_NAME`   
+   3. Update whisk.properties with the path to the credentials.json file
+   4. Run this command - `gradle :tests:test --tests "packages.MqttWatsonTests"`   
 
 To execute all tests, run `gradle :tests:test`
 
