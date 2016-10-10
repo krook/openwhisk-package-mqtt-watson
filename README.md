@@ -64,6 +64,8 @@ The main feed action in this package is `feed-action.js`. When a trigger is asso
 ### Bluemix Installation
 First you need to install the `wsk` CLI, follow the instructions at https://new-console.ng.bluemix.net/openwhisk/cli
 
+This step assumes you've already deployed the Event Provider application. If not, see the section below.
+
 `./install.sh openwhisk.ng.bluemix.net $AUTH_KEY $WSK_CLI $PROVIDER_ENDPOINT`
 
 `./uninstall.sh openwhisk.ng.bluemix.net $API_HOST $AUTH_KEY $WSK_CLI`
