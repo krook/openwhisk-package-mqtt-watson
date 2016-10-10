@@ -46,7 +46,7 @@ feed_controller.initialise().then(() => {
 
     // Registers a trigger to call back on message, needs the OpenWhisk credentials to call the API 
     app.post('/mqtt-watson', function (req, res) {
-        // trigger (namespace/name), url, topic, openWhiskUsername, openWhiskPassword, watsonUsername, watsonPassword, watsonClientId
+        // trigger (namespace/name), url, topic, username, password, apiKey, apiToken, watsonClientId
         feed_controller.add_trigger(req.body).then(() => res.send())
           .catch(err => handle_error(err, 'Failed to add Watson IoT MQTT topic trigger', res));
     });

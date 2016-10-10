@@ -9,18 +9,18 @@ class MQTTSubscriptionMgr extends EventEmitter {
         this.mqtt = mqtt;
     }
 
-    conn_client (url, username, password, client) {
+    conn_client (url, apiKey, apiToken, client) {
         if (!this.connections.has(url)) {
-           this.setup_client(url, username, password, client);
+           this.setup_client(url, apiKey, apiToken, client);
         }
 
         return this.connections.get(url);
     }
 
-    setup_client (url, username, password, clientId) {
+    setup_client (url, apiKey, apiToken, clientId) {
         const client = this.mqtt.connect(url, {
-            username: username,
-            password: password,
+            apiKey: apiKey,
+            apiToken: apiToken,
             clientId: clientId,
             rejectUnauthorized: true,
             connectTimeout: 90*1000
@@ -63,8 +63,8 @@ class MQTTSubscriptionMgr extends EventEmitter {
       return this.connections.get(url).client.connected;
     }
 
-    subscribe (url, topic, username, password, clientId) {
-        const topic_client = this.conn_client(url, username, password, clientId);
+    subscribe (url, topic, apiKey, apiToken, clientId) {
+        const topic_client = this.conn_client(url, apiKey, apiToken, clientId);
         const listener_count = (topic_client.topics.get(topic) || 0);
 
         if (!listener_count) {

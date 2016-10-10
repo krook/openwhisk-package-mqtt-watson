@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 IBM Corporation
+ * Copyright 2016 IBM Corporation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,21 +26,31 @@ import scala.collection.immutable.HashMap
 import org.scalatest.FlatSpecLike
 
 @RunWith(classOf[JUnitRunner])
-class TemplateTests extends TestHelpers with WskTestHelpers with Matchers {
+class MqttWatsonTests extends TestHelpers with WskTestHelpers with Matchers {
 
   implicit val wskprops = WskProps()
   val wsk = new Wsk()
 
-  //val credentials = TestUtils.getVCAPcredentials("openwhisk-local")
-  //val apiKey = credentials.get("apiKey");
+  val credentials = TestUtils.getVCAPcredentials("watson-mqtt")
+  val url = credentials.get("url");
+  val topic = credentials.get("topic");
+  val apiKey = credentials.get("apiKey");
+  val apiToken = credentials.get("apiToken");
+  val client = credentials.get("client");
 
   behavior of "Watson MQTT Package"
 
     "trigger creation" should "return ok: created trigger feed" in {
-    val triggerName = "trigger_rss_update"
-    val feed = Some("/guest/rss/rss_feed")
+    val triggerName = "trigger_watson_iot_update"
+    val feed = Some("/guest/watson-mqtt/feed-action")
     val annotation = Map("dummy"->"dummy".toJson)
-    val params = Map("url" -> "http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml".toJson, "pollingInterval" -> "2h".toJson);
+    val params = Map(
+      "url" -> url.toJson, 
+      "topic" -> topic.toJson,
+      "apiKey" -> apiKey.toJson,
+      "apiToken" -> apiToken.toJson,
+      "client" -> client.toJson
+    );
 
     var res = wsk.trigger.create(triggerName,params,annotation,feed)
     res.toString should include("ok: created trigger feed")

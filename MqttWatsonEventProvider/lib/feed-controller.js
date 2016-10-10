@@ -45,16 +45,16 @@ class FeedController {
         console.log(`Firing trigger: ${trigger.trigger}`, params);
         const namespace = trigger.trigger.split('/')[0];
         const name = trigger.trigger.split('/')[1];
-        var ow = openwhisk({api: this.ow_endpoint, api_key: `${trigger.openWhiskUsername}:${trigger.openWhiskPassword}`, namespace: namespace});
+        var ow = openwhisk({api: this.ow_endpoint, api_key: `${trigger.username}:${trigger.password}`, namespace: namespace});
         ow.triggers.invoke({triggerName: name, params: params})
           .catch(err => console.error(`Failed to fire trigger ${trigger.trigger}`, err.reason))
     }
 
-    // trigger: trigger (namespace/name), url, topic, openWhiskUsername, openWhiskPassword, watsonUsername, watsonPassword, watsonClientId
+    // trigger: trigger (namespace/name), url, topic, username, password, apiKey, apiToken, clientId
     add_trigger (trigger) {
         const mgr = this.mqtt-subscription-manager;
         return this.trigger-store.add(trigger).then(() => { 
-            mgr.subscribe(trigger.url, trigger.topic, trigger.watsonUsername, trigger.watsonPassword, trigger.watsonClientId);
+            mgr.subscribe(trigger.url, trigger.topic, trigger.apiKey, trigger.apiToken, trigger.clientId);
             if (mgr.is_connected(trigger.url)) {
                const params = {type: 'status', body: 'connected'};
                this.fire_trigger(trigger, params);
