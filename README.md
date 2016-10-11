@@ -148,7 +148,15 @@ $WSK_CLI trigger create subscription-event-trigger \
  3. Create the rule that associate the trigger and the action:
  `$WSK_CLI rule create --enable handle-topic-message-rule subscription-event-trigger handler-action`
 
- 4. After posting a message to the MQTT topic that triggers events you have subscribed to, you can verify the action was invoked by checking the most recent activations:
+ 4. Post a message to the MQTT topic that triggers events you have subscribed to
+ ```
+ {
+     "serial": "aaaabbbbcccc",
+     "reading": "15"
+ }
+ ```
+
+ 5. Verify the action was invoked by checking the most recent activations:
 
  `$WSK_CLI activation list --limit 1 handler-action`
 
