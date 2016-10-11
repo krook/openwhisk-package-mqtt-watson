@@ -83,8 +83,9 @@ This service can be hosted as a Cloud Foundry application. To deploy on IBM Blue
   }
 }
 ```
-3. Change the name and host fields as necessary in the manifest.yml. Bluemix requires routes to be globally unique so there's a variable to generate a random hostname if you don't change it.
-4. Run `cf push`
+3. Change to the `MqttWatsonEventProvider` directory.
+4. Change the name and host fields as necessary in `manifest.yml`.
+5. Run `cf push`
 
 ## Watson IoT MQTT Package Installation
 
@@ -95,12 +96,14 @@ This step assumes you've already deployed the Event Provider application (or you
 
 `./install.sh openwhisk.ng.bluemix.net $AUTH_KEY $WSK_CLI $PROVIDER_ENDPOINT`
 
-`./uninstall.sh openwhisk.ng.bluemix.net $AUTH_KEY $WSK_CLI`
-
 where:
 - **$AUTH_KEY** is the OpenWhisk authentication key (Run `wsk property get` to obtain it)
 - **$WSK_CLI** is the path of OpenWhisk command interface binary
 - **$PROVIDER_ENDPOINT** is the endpoint of the event provider service running as a Cloud Foundry application on Bluemix. It's a fully qualified URL including the path to the resource. i.e. http://mqtt-watson-random-word.mybluemix.net/mqtt-watson
+
+To uninstall:
+
+`./uninstall.sh openwhisk.ng.bluemix.net $AUTH_KEY $WSK_CLI`
 
 ## Usage of Watson MQTT package
 To use this trigger feed, you need to pass all of the required parameters (refer to the table above)
@@ -110,9 +113,9 @@ $WSK_CLI trigger create subscription-event-trigger \
     -f mqtt-watson/feed-action \
     -p topic "$WATSON_TOPIC" \
     -p url "ssl://$WATSON_TEAM_ID.messaging.internetofthings.ibmcloud.com:8883" \
-    -p apiKey "$WATSON_apiKey" \
-    -p apiToken "$WATSON_apiToken" \
-    -p clientId "$WATSON_CLIENT"
+    -p apiKey "$WATSON_APIKEY" \
+    -p apiToken "$WATSON_APITOKEN" \
+    -p clientId "$WATSON_CLIENTID"
 ```
 
 For example:
@@ -125,10 +128,6 @@ $WSK_CLI trigger create subscription-event-trigger \
     -p apiToken "+-derpbog" \
     -p clientId "a:12e45g:mqttapp"
 ```
-
-To use trigger feed to delete the trigger.
-
-`$WSK_CLI trigger delete subscription-event-trigger`
 
 ## Associate Watson MQTT trigger and action by using rule
  1. Create a new trigger, using the example above.
@@ -165,6 +164,13 @@ To use trigger feed to delete the trigger.
      "payload": "Device with serial: 123456 emitted a reading: 15"
  }
  ```
+
+ To delete the rule, trigger, and action:
+ `$WSK_CLI rule disable handle-topic-message-rule`
+ `$WSK_CLI rule delete handle-topic-message-rule`
+ `$WSK_CLI trigger delete subscription-event-trigger`
+ `$WSK_CLI action delete handler-action`
+
 
 ## Contributing
 Please refer to [CONTRIBUTING.md](CONTRIBUTING.md)
