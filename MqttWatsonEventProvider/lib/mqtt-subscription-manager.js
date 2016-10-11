@@ -18,9 +18,10 @@ class MQTTSubscriptionMgr extends EventEmitter {
     }
 
     setup_client (url, apiKey, apiToken, clientId) {
+        
         const client = this.mqtt.connect(url, {
-            apiKey: apiKey,
-            apiToken: apiToken,
+            username: apiKey,
+            password: apiToken,
             clientId: clientId,
             rejectUnauthorized: true,
             connectTimeout: 90*1000

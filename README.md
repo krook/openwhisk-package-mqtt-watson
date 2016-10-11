@@ -3,9 +3,9 @@
 
 This package provides a mechanism to trigger OpenWhisk actions when messages are received on an MQTT topic in the Watson IoT Platform. It sets up a Cloud Foundry application that can be configured to listen to one or more topics on a persistent connection, then invokes the registered actions as a feed action.
 
-This package targets OpenWhisk developers who are building serverless applications and need integration with the Watson implementation of MQTT. You can add this package to your existing OpenWhisk namespace alongside your other actions, triggers, and rules.
+This package targets OpenWhisk developers who are building serverless applications and need integration with the Watson implementation of MQTT to trigger actions. You can add this package to your existing OpenWhisk namespace alongside your other actions, triggers, and rules.
 
-This package can also be run in a multitenanted fashion by third parties that want to provide and share an implementation of the event provider with other OpenWhisk developers.
+This package can also be run in a multi-tenant fashion by third parties that wish to provide a hosted implementation of the event provider with other OpenWhisk developers.
 
 The code is based on the generic MQTT package originally created by [James Thomas](http://jamesthom.as/blog/2016/06/15/openwhisk-and-mqtt/). It differs in that it incorporates the credentials needed to connect to the Watson IoT platform, and in that it sets up the event provider as a Cloud Foundry application rather than a Docker container.
 
@@ -51,30 +51,14 @@ The main feed action in this package is `feed-action.js`. When a trigger is asso
 | apiToken | *string* | yes |  Watson IoT API token  | "+-derpbog" |
 | client | *string* | yes |  Application client id  | "a:12e45g:mqttapp" |
 
-## Watson MQTT Package Installation
-
-### Bluemix Installation
-First you need to install the `wsk` CLI, follow the instructions at https://new-console.ng.bluemix.net/openwhisk/cli
-
-This step assumes you've already deployed the Event Provider application (or you are using the test one at `http://openwhisk-package-mqtt-watson.mybluemix.net/mqtt-watson`). If not, see the section below.
-
-`./install.sh openwhisk.ng.bluemix.net $AUTH_KEY $WSK_CLI $PROVIDER_ENDPOINT`
-
-`./uninstall.sh openwhisk.ng.bluemix.net $AUTH_KEY $WSK_CLI`
-
-where:
-- **$AUTH_KEY** is the OpenWhisk authentication key (Run `wsk property get` to obtain it)
-- **$WSK_CLI** is the path of OpenWhisk command interface binary
-- **$PROVIDER_ENDPOINT** is the endpoint of the event provider service running as a Cloud Foundry application on Bluemix. It's a fully qualified URL including the path to the resource. i.e. http://mqtt-watson-random-word.mybluemix.net/mqtt-watson
-
 
 ## Watson IoT MQTT Service (Event Provider) Deployment
 
-In order to support integration with the Watson IoT environment there needs to be an event generating feed that fires a trigger in the OpenWhisk environment when messages are received. This service connects to a particular MQTT topic and then invokes the triggers that are registered for that topic. It has its own Cloudant/CouchDB database to persist the topic-to-trigger subscription information. You will need to initialize this database prior to using this service.
+In order to support integration with the Watson IoT environment we need an event feed that fires a trigger in the OpenWhisk environment when messages are received. This service connects to a particular MQTT topic and then invokes the triggers that are registered for a given topic. It has its own Cloudant database to persist the topic-to-trigger subscription information. You will need to initialize this database prior to using this service.
 
-There are two options to deploy the service:
+For testing, you can use my demo event provider. If so, move on to the next section to install the package and specify `http://openwhisk-package-mqtt-watson.mybluemix.net/mqtt-watson` as the event provider. Be warned however, it will store your OpenWhisk credentials (to invoke the subscribed trigger later). Change your OpenWhisk API key after testing if you choose to use this service.
 
-### Bluemix Deployment:
+### Bluemix Deployment
 This service can be hosted as a Cloud Foundry application. To deploy on IBM Bluemix:
 
 1. Create a Cloudant service on Bluemix, name it `cloudant-mqtt-watson` and create a database with name `topic_listeners`.
@@ -99,8 +83,24 @@ This service can be hosted as a Cloud Foundry application. To deploy on IBM Blue
   }
 }
 ```
-3. Change the name and host fields in the manifest.yml to be unique. Bluemix requires routes to be globally unique.
+3. Change the name and host fields as necessary in the manifest.yml. Bluemix requires routes to be globally unique so there's a variable to generate a random hostname if you don't change it.
 4. Run `cf push`
+
+## Watson IoT MQTT Package Installation
+
+### Bluemix Installation
+First you need to install the `wsk` CLI, follow the instructions at https://new-console.ng.bluemix.net/openwhisk/cli
+
+This step assumes you've already deployed the Event Provider application (or you are using the test one at `http://openwhisk-package-mqtt-watson.mybluemix.net/mqtt-watson`). If not, see the section below.
+
+`./install.sh openwhisk.ng.bluemix.net $AUTH_KEY $WSK_CLI $PROVIDER_ENDPOINT`
+
+`./uninstall.sh openwhisk.ng.bluemix.net $AUTH_KEY $WSK_CLI`
+
+where:
+- **$AUTH_KEY** is the OpenWhisk authentication key (Run `wsk property get` to obtain it)
+- **$WSK_CLI** is the path of OpenWhisk command interface binary
+- **$PROVIDER_ENDPOINT** is the endpoint of the event provider service running as a Cloud Foundry application on Bluemix. It's a fully qualified URL including the path to the resource. i.e. http://mqtt-watson-random-word.mybluemix.net/mqtt-watson
 
 ## Usage of Watson MQTT package
 To use this trigger feed, you need to pass all of the required parameters (refer to the table above)
