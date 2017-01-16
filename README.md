@@ -190,7 +190,7 @@ $WSK_CLI trigger create subscription-event-trigger \
 
 ## Contributing
 
-Please refer to <CONTRIBUTING.md>
+Please refer to [contribution guidelines](CONTRIBUTING.md).
 
 ## License
 
