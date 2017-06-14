@@ -46,10 +46,9 @@ $WSK_CLI \
 
 $WSK_CLI --apihost "$API_HOST" action create \
   --auth "$AUTH_KEY" \
-  --shared yes \
   mqtt-watson/feed-action $PACKAGE_HOME/feeds/feed-action.js \
   --annotation feed true \
   --annotation description "A feed action to register to Watson IoT MQTT events meeting user specified criteria" \
-  --annotation parameters '[{"name": "url", "required": true, "bindTime": true, "description": "Watson MQTT host URL"}, {"name": "topic", "required": true, "bindTime": true, "description": "MQTT topic to subscribe to"}, {"name": "apiKey", "required": true, "bindTime": true, "": "API key"}, {"name": "apiToken", "required": true, "bindTime": true, "": "API token"}, {"name": "client", "required": true, "bindTime": true, "": "Application client id"}]' \
-  --annotation sampleInput '{"url": "ssl://a-123xyz.messaging.internetofthings.ibmcloud.com:8883", "topic": "iot-2/type/+/id/+/evt/+/fmt/json", "apiKey": "a-123xyz", "apiToken": "+-derpbog", "client": "a:12e45g:mqttapp"}' \
+  --annotation parameters '[{"name": "url", "required": true, "bindTime": true, "description": "Watson MQTT host URL"}, {"name": "topic", "required": true, "bindTime": true, "description": "MQTT topic to subscribe to"}, {"name": "username", "required": true, "bindTime": true, "": "API key"}, {"name": "password", "required": true, "bindTime": true, "": "API token"}, {"name": "client", "required": true, "bindTime": true, "": "Application client id"}]' \
+  --annotation sampleInput '{"url": "ssl://a-123xyz.messaging.internetofthings.ibmcloud.com:8883", "topic": "iot-2/type/+/id/+/evt/+/fmt/json", "username": "a-123xyz", "password": "+-derpbog", "client": "a:12e45g:mqttapp"}' \
   --verbose
