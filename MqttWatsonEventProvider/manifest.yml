@@ -1,5 +1,5 @@
 applications:
-- name: mqtt-watson-${random-word}
+- name: mqtt-watson
   host: mqtt-watson-${random-word}
   path: .
   domain: mybluemix.net

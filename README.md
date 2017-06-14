@@ -1,7 +1,5 @@
 # OpenWhisk MQTT Package for Watson IoT
 
-==========================
-
 This package provides a mechanism to trigger OpenWhisk actions when messages are received on an MQTT topic in the Watson IoT Platform. It sets up a Cloud Foundry application that can be configured to listen to one or more topics on a persistent connection, then invokes the registered actions as a feed action.
 
 This package targets OpenWhisk developers who are building serverless applications and need integration with the Watson implementation of MQTT to trigger actions. You can add this package to your existing OpenWhisk namespace alongside your other actions, triggers, and rules.
@@ -13,7 +11,7 @@ The code is based on the generic MQTT package originally created by [James Thoma
 ```
 openwhisk-package-mqtt-watson/
 ├── actions
-│      └── handler-action.js
+│      └── handler.js
 ├── CONTRIBUTING.md
 ├── feeds
 │      └── feed-action.js
@@ -25,9 +23,9 @@ openwhisk-package-mqtt-watson/
 │      ├── manifest.yml
 │      ├── package.json
 │      └── lib
-│          ├── feed-controller.js
-│          ├── mqtt-subscription-manager.js
-│          └── trigger-store.js
+│          ├── feed_controller.js
+│          ├── mqtt_subscription_manager.js
+│          └── trigger_store.js
 └── uninstall.sh
 ```
 
@@ -52,47 +50,48 @@ The main feed action in this package is `feed-action.js`. When a trigger is asso
 ------------- | -------- | ------------ | --------------------------- | -------------------------------------------------------------
 url           | _string_ | yes          | URL to Watson IoT MQTT feed | "ssl://a-123xyz.messaging.internetofthings.ibmcloud.com:8883"
 topic         | _string_ | yes          | Topic subscription          | "iot-2/type/+/id/+/evt/+/fmt/json"
-apiKey        | _string_ | yes          | Watson IoT API key          | "a-123xyz"
-apiToken      | _string_ | yes          | Watson IoT API token        | "+-derpbog"
+username        | _string_ | yes          | Watson IoT API key          | "a-123xyz"
+password      | _string_ | yes          | Watson IoT API token        | "+-derpbog"
 client        | _string_ | yes          | Application client id       | "a:12e45g:mqttapp"
 
 ## Watson IoT MQTT Service (Event Provider) Deployment
 
 In order to support integration with the Watson IoT environment we need an event feed that fires a trigger in the OpenWhisk environment when messages are received. This service connects to a particular MQTT topic and then invokes the triggers that are registered for a given topic. It has its own Cloudant database to persist the topic-to-trigger subscription information. You will need to initialize this database prior to using this service.
 
-For testing, you can use my demo event provider. If so, move on to the next section to install the package and specify `http://openwhisk-package-mqtt-watson.mybluemix.net/mqtt-watson` as the event provider. Be warned however, it will store your OpenWhisk credentials (to invoke the subscribed trigger later). Change your OpenWhisk API key after testing if you choose to use this service.
-
 ### Bluemix Deployment
 
 This service can be hosted as a Cloud Foundry application. To deploy on IBM Bluemix:
 
-1. Create a Cloudant service on Bluemix, name it `cloudant-mqtt-watson` and create a database with name `topic_listeners`.
-2. Create a view for that Cloudant database, by creating a new design document with this content. It will provide a way to query for the subscriptions.
+1. Create a Cloudant service on Bluemix, name it `cloudant-mqtt-watson` and create a database named `topic_listeners`.
+
+2. Create a view for that Cloudant database, by creating a new design document with the following content. It provides a way to query for the subscriptions.
 
   ```json
   {
-  "_id": "_design/subscriptions",
-  "views": {
-   "host_topic_counts": {
-     "reduce": "_sum",
-     "map": "function (doc) {\n  emit(doc.url + '#' + doc.topic, 1);\n}"
-   },
-   "host_topic_triggers": {
-     "map": "function (doc) {\n  emit(doc.url + '#' + doc.topic, {trigger: doc._id, username: doc.username, password: doc.password});\n}"
-   },
-   "all": {
-     "map": "function (doc) {\n  emit(doc._id, doc.url + '#' + doc.topic);\n}"
-   },
-   "host_triggers": {
-     "map": "function (doc) {\n  emit(doc.url, {trigger: doc._id, username: doc.username, password: doc.password});\n}"
-   }
-  }
+  	"_id": "_design/subscriptions",
+  	"views": {
+  		"host_topic_counts": {
+  			"reduce": "_sum",
+  			"map": "function (doc) {\n  emit(doc.url + '#' + doc.topic, 1);\n}"
+  		},
+  		"host_topic_triggers": {
+  			"map": "function (doc) {\n  emit(doc.url + '#' + doc.topic, {trigger: doc._id, username: doc.username, password: doc.password});\n}"
+  		},
+  		"all": {
+  			"map": "function (doc) {\n  emit(doc._id, doc.url + '#' + doc.topic);\n}"
+  		},
+  		"host_triggers": {
+  			"map": "function (doc) {\n  emit(doc.url, {trigger: doc._id, username: doc.username, password: doc.password});\n}"
+  		}
+  	}
   }
   ```
 
 3. Change to the `MqttWatsonEventProvider` directory.
+
 4. Change the name and host fields as necessary in `manifest.yml`.
-5. Run `cf push`
+
+5. Run `cf push` and take note of the generated hostname route.
 
 ## Watson IoT MQTT Package Installation
 
@@ -100,15 +99,15 @@ This service can be hosted as a Cloud Foundry application. To deploy on IBM Blue
 
 First you need to install the `wsk` CLI, follow the instructions at <https://new-console.ng.bluemix.net/openwhisk/cli>
 
-This step assumes you've already deployed the Event Provider application (or you are using the test one at `http://openwhisk-package-mqtt-watson.mybluemix.net/mqtt-watson`). If not, see the section below.
+This step assumes you've already deployed the Event Provider application. If not, see the section above.
 
 `./install.sh openwhisk.ng.bluemix.net $AUTH_KEY $WSK_CLI $PROVIDER_ENDPOINT`
 
-where:
+Where:
 
 - **$AUTH_KEY** is the OpenWhisk authentication key (Run `wsk property get` to obtain it)
 - **$WSK_CLI** is the path of OpenWhisk command interface binary
-- **$PROVIDER_ENDPOINT** is the endpoint of the event provider service running as a Cloud Foundry application on Bluemix. It's a fully qualified URL including the path to the resource. i.e. <http://mqtt-watson-random-word.mybluemix.net/mqtt-watson>
+- **$PROVIDER_ENDPOINT** is the endpoint of the event provider service running as a Cloud Foundry application on Bluemix. It's a fully qualified URL including the path to the resource. i.e. <http://mqtt-watson-${random-word}.mybluemix.net/mqtt-watson>
 
 To uninstall:
 
@@ -120,31 +119,31 @@ To use this trigger feed, you need to pass all of the required parameters (refer
 
 ```bash
 $WSK_CLI trigger create subscription-event-trigger \
-    -f mqtt-watson/feed-action \
-    -p topic "$WATSON_TOPIC" \
-    -p url "ssl://$WATSON_TEAM_ID.messaging.internetofthings.ibmcloud.com:8883" \
-    -p apiKey "$WATSON_APIKEY" \
-    -p apiToken "$WATSON_APITOKEN" \
-    -p clientId "$WATSON_CLIENTID"
+  --feed mqtt-watson/feed-action \
+  --param topic "$WATSON_TOPIC" \
+  --param url "ssl://$WATSON_TEAM_ID.messaging.internetofthings.ibmcloud.com:8883" \
+  --param username "$WATSON_username" \
+  --param password "$WATSON_password" \
+  --param client "$WATSON_client"
 ```
 
 For example:
 
 ```bash
 $WSK_CLI trigger create subscription-event-trigger \
-    -f mqtt-watson/feed-action \
-    -p topic "iot-2/type/+/id/+/evt/+/fmt/json" \
-    -p url "ssl://12e45g.messaging.internetofthings.ibmcloud.com:8883" \
-    -p apiKey "a-123xyz" \
-    -p apiToken "+-derpbog" \
-    -p clientId "a:12e45g:mqttapp"
+  --feed mqtt-watson/feed-action \
+  --param topic "iot-2/type/+/id/+/evt/+/fmt/json" \
+  --param url "ssl://12e45g.messaging.internetofthings.ibmcloud.com:8883" \
+  --param username "a-123xyz" \
+  --param password "+-derpbog" \
+  --param client "a:12e45g:mqttapp"
 ```
 
 ## Associate Watson MQTT trigger and action by using rule
 
 1. Create a new trigger, using the example above.
 
-2. Write a 'handler-action.js' file that reacts to the trigger events with action code below:
+2. See the [`handler.js`](actions/handler.js) file that reacts to the trigger events with action code below:
 
   ```javascript
   function main(params) {
@@ -156,11 +155,11 @@ $WSK_CLI trigger create subscription-event-trigger \
   }
   ```
 
-  Upload the action: `$WSK_CLI action create handler-action actions/handler-action.js`
+  Upload the action: `$WSK_CLI action create handler actions/handler.js`
 
-3. Create the rule that associate the trigger and the action: `$WSK_CLI rule create --enable handle-topic-message-rule subscription-event-trigger handler-action`
+3. Create the rule that associate the trigger and the action: `$WSK_CLI rule create handle-topic-message-rule subscription-event-trigger handler`
 
-4. Post a message to the MQTT topic that triggers events you have subscribed to
+4. Post a message to the MQTT topic that triggers events you have subscribed to:
 
   ```json
   {
@@ -171,11 +170,11 @@ $WSK_CLI trigger create subscription-event-trigger \
 
 5. Verify the action was invoked by checking the most recent activations:
 
-  `$WSK_CLI activation list --limit 1 handler-action`
+  `$WSK_CLI activation list --limit 1 handler`
 
   ```
   activations
-  f9d41bd2589943efa4f36c5cf1f55b44             handler-action
+  f9d41bd2589943efa4f36c5cf1f55b44             handler
   ```
 
   `$WSK_CLI activation result f9d41bd2589943efa4f36c5cf1f55b44`
@@ -186,16 +185,19 @@ $WSK_CLI trigger create subscription-event-trigger \
   }
   ```
 
-  To delete the rule, trigger, and action: `$WSK_CLI rule disable handle-topic-message-rule` `$WSK_CLI rule delete handle-topic-message-rule` `$WSK_CLI trigger delete subscription-event-trigger` `$WSK_CLI action delete handler-action`
+  To delete the rule, trigger, and action:
+
+  ```bash
+  $WSK_CLI rule disable handle-topic-message-rule
+  $WSK_CLI rule delete handle-topic-message-rule
+  $WSK_CLI trigger delete subscription-event-trigger
+  $WSK_CLI action delete handler
+  ```
 
 ## Contributing
 
 Please refer to [contribution guidelines](CONTRIBUTING.md).
 
+
 ## License
-
-Copyright 2016 IBM Corporation
-
-Licensed under the [MIT license](LICENSE.txt).
-
-Unless required by applicable law or agreed to in writing, software distributed under the license is distributed on an "as is" basis, without warranties or conditions of any kind, either express or implied. See the license for the specific language governing permissions and limitations under the license.
+[Apache 2.0](LICENSE.txt)
