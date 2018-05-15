@@ -16,7 +16,7 @@
 'use strict';
 
 const express = require('express');
-const Cloudant = require('cloudant');
+const Cloudant = require('@cloudant/cloudant');
 const FeedController = require('./lib/feed_controller.js');
 
 // Setup express for handling HTTP requests
