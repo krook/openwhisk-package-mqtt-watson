@@ -97,16 +97,15 @@ This service can be hosted as a Cloud Foundry application. To deploy on IBM Blue
 
 ### Bluemix Installation
 
-First you need to install the `wsk` CLI, follow the instructions at <https://new-console.ng.bluemix.net/openwhisk/cli>
+First you need to install the `bx wsk` CLI, follow the instructions at <https://new-console.ng.bluemix.net/openwhisk/cli>
 
 This step assumes you've already deployed the Event Provider application. If not, see the section above.
 
-`./install.sh openwhisk.ng.bluemix.net $AUTH_KEY $WSK_CLI $PROVIDER_ENDPOINT`
+`./install.sh openwhisk.ng.bluemix.net $AUTH_KEY PROVIDER_ENDPOINT`
 
 Where:
 
 - **$AUTH_KEY** is the OpenWhisk authentication key (Run `wsk property get` to obtain it)
-- **$WSK_CLI** is the path of OpenWhisk command interface binary
 - **$PROVIDER_ENDPOINT** is the endpoint of the event provider service running as a Cloud Foundry application on Bluemix. It's a fully qualified URL including the path to the resource. i.e. <http://mqtt-watson-${random-word}.mybluemix.net/mqtt-watson>
 
 To uninstall:
@@ -118,7 +117,7 @@ To uninstall:
 To use this trigger feed, you need to pass all of the required parameters (refer to the table above)
 
 ```bash
-$WSK_CLI trigger create subscription-event-trigger \
+bx wsk trigger create subscription-event-trigger \
   --feed mqtt-watson/feed-action \
   --param topic "$WATSON_TOPIC" \
   --param url "ssl://$WATSON_TEAM_ID.messaging.internetofthings.ibmcloud.com:8883" \
@@ -130,7 +129,7 @@ $WSK_CLI trigger create subscription-event-trigger \
 For example:
 
 ```bash
-$WSK_CLI trigger create subscription-event-trigger \
+bx wsk trigger create subscription-event-trigger \
   --feed mqtt-watson/feed-action \
   --param topic "iot-2/type/+/id/+/evt/+/fmt/json" \
   --param url "ssl://12e45g.messaging.internetofthings.ibmcloud.com:8883" \
@@ -155,9 +154,9 @@ $WSK_CLI trigger create subscription-event-trigger \
   }
   ```
 
-  Upload the action: `$WSK_CLI action create handler actions/handler.js`
+  Upload the action: `bx wsk action create handler actions/handler.js`
 
-3. Create the rule that associate the trigger and the action: `$WSK_CLI rule create handle-topic-message-rule subscription-event-trigger handler`
+3. Create the rule that associate the trigger and the action: `bx wsk rule create handle-topic-message-rule subscription-event-trigger handler`
 
 4. Post a message to the MQTT topic that triggers events you have subscribed to:
 
@@ -170,14 +169,14 @@ $WSK_CLI trigger create subscription-event-trigger \
 
 5. Verify the action was invoked by checking the most recent activations:
 
-  `$WSK_CLI activation list --limit 1 handler`
+  `bx wsk activation list --limit 1 handler`
 
   ```
   activations
   f9d41bd2589943efa4f36c5cf1f55b44             handler
   ```
 
-  `$WSK_CLI activation result f9d41bd2589943efa4f36c5cf1f55b44`
+  `bx wsk activation result f9d41bd2589943efa4f36c5cf1f55b44`
 
   ```json
   {
@@ -188,10 +187,10 @@ $WSK_CLI trigger create subscription-event-trigger \
   To delete the rule, trigger, and action:
 
   ```bash
-  $WSK_CLI rule disable handle-topic-message-rule
-  $WSK_CLI rule delete handle-topic-message-rule
-  $WSK_CLI trigger delete subscription-event-trigger
-  $WSK_CLI action delete handler
+  bx wsk rule disable handle-topic-message-rule
+  bx wsk rule delete handle-topic-message-rule
+  bx wsk trigger delete subscription-event-trigger
+  bx wsk action delete handler
   ```
 
 ## Contributing

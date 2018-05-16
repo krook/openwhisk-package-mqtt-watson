@@ -19,16 +19,16 @@
 set -e
 set -x
 
-if [ $# -eq 0 ]
+if [ $# -ne 3 ]
 then
-  echo "Usage: ./install.sh $API_HOST $AUTH_KEY $WSK_CLI $PROVIDER_ENDPOINT"
-  exit
+  echo "Usage: ./install.sh $API_HOST $AUTH_KEY $PROVIDER_ENDPOINT"
+  exit 1
 fi
 
 API_HOST="$1"
 AUTH_KEY="$2"
-WSK_CLI="$3"
-PROVIDER_ENDPOINT="$4"
+PROVIDER_ENDPOINT="$3"
+WSK_CLI="bx wsk"
 
 PACKAGE_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo $PACKAGE_HOME

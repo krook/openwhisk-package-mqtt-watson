@@ -19,9 +19,10 @@
 set -e
 set -x
 
-if [ $# -eq 0 ]
+if [ $# -ne 2 ]
 then
-  echo "Usage: ./uninstall.sh $API_HOST $AUTH_KEY $WSK_CLI"
+  echo "Usage: ./uninstall.sh $API_HOST $AUTH_KEY"
+  exit 1
 fi
 
 API_HOST="$1"
@@ -31,10 +32,10 @@ WSK_CLI="$3"
 PACKAGE_HOME="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 echo Uninstalling Watson MQTT Package \
 
-$WSK_CLI --apihost "$API_HOST" action delete \
+bx wsk --apihost "$API_HOST" action delete \
   --auth "$AUTH_KEY"  \
   mqtt-watson/feed-action
 
-$WSK_CLI --apihost "$API_HOST" package delete \
+bx wsk --apihost "$API_HOST" package delete \
   --auth "$AUTH_KEY" \
   mqtt-watson
