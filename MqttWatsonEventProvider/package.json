@@ -16,7 +16,7 @@
     "cloudant": "^1.4.1",
     "express": "^4.13.4",
     "mqtt": "^1.10.0",
-    "openwhisk": "^2.0.0",
+    "openwhisk": "^3.21.2",
     "proxyquire": "^1.7.9"
   },
   "devDependencies": {
